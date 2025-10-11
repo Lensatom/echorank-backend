@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { paginationHelper } from "helpers/paginationHelper";
-import Poll from "models/poll";
+import { paginationHelper } from "../../helpers";
+import Poll from "../../models/poll";
 
 export const getUserPollsController = async (req: Request, res: Response) => {
   try {

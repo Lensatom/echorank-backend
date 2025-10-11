@@ -2,9 +2,9 @@ import express  from "express"
 import { connectDB } from "./config/db";
 import authRouter from "./routes/auth";
 import { env } from "./config/env";
-import userRouter from "routes/user";
-import pollRouter from "routes/poll";
-import { verifyToken } from "middlewares";
+import pollRouter from "./routes/poll";
+import userRouter from "./routes/user";
+import { verifyToken } from "./middlewares";
 
 const {
   PORT,
@@ -26,6 +26,10 @@ app.use("/user", userRouter)
 app.use("/poll", pollRouter)
 
 connectDB(MONGODB_URI)
+
+const crypto = require('crypto');
+const secret = crypto.randomBytes(64).toString('hex');
+console.log(secret);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

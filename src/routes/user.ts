@@ -1,12 +1,12 @@
-import { deleteUserController } from "controllers/user/deleteUserController";
-import { getAllUsersController, getUserByIdController, retrieveUserController } from "controllers/user/getUserController";
 import { Router } from "express";
+import {
+  deleteUserByIdController,
+  retrieveUserController
+} from "../controllers/user";
 
 const userRouter = Router()
 
 userRouter.get("/", retrieveUserController)
-userRouter.get("/:userId", getUserByIdController)
-userRouter.get("/all", getAllUsersController)
-userRouter.delete("/", deleteUserController)
+userRouter.delete("/:userId", deleteUserByIdController)
 
 export default userRouter

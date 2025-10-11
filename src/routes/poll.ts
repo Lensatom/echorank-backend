@@ -1,12 +1,11 @@
-import { createPollController, deletePollController, getAllPollsController, getPollByIdController, getUserPollsController } from "controllers/poll";
 import { Router } from "express";
+import { createPollController, deletePollController, getPollByIdController, getUserPollsController } from "../controllers/poll";
 
 const pollRouter = Router();
 
 pollRouter.post("/", createPollController);
-pollRouter.get("/:pollId", getPollByIdController);
 pollRouter.get("/", getUserPollsController);
-pollRouter.get("/all", getAllPollsController);
+pollRouter.get("/:pollId", getPollByIdController);
 pollRouter.delete("/:pollId", deletePollController);
 
 export default pollRouter;

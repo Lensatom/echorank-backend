@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
-import jwt, { JwtPayload } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import { env } from "../config/env"
-import { UserPayload } from "types/express"
+import { UserPayload } from "../types/express"
 
 const {
   JWT_SECRET

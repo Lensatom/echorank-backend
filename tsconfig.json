@@ -8,7 +8,6 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "esModuleInterop": true,
     "strict": true,
-    "baseUrl": "./src",
   },
   "include": ["src"]
 }
