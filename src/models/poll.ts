@@ -2,7 +2,6 @@ import { model, Schema } from "mongoose";
 
 const optionSchema = new Schema({
   title: { type: String, required: true },
-  value: { type: String, required: true },
   imageURL: { type: String }
 }, { _id: false });
 
@@ -18,6 +17,16 @@ const pollSchema = new Schema({
   sub_title: { type: String },
   sections: { type: [sectionSchema], required: true },
   voteCount: { type: Number, required: true, default: 0 },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  user: {
+    type: {
+      _id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+      email: { type: String, required: true },
+      first_name: { type: String, required: true },
+      last_name: { type: String, required: true },
+    },
+    required: true
+  },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
 })

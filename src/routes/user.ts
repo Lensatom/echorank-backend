@@ -4,9 +4,9 @@ import { Router } from "express";
 
 const userRouter = Router()
 
-userRouter.get("/user", retrieveUserController)
-userRouter.get("/user/:userId", getUserByIdController)
-userRouter.get("/users", getAllUsersController)
-userRouter.delete("/user", deleteUserController)
+userRouter.get("/", retrieveUserController)
+userRouter.get("/:userId", getUserByIdController)
+userRouter.get("/all", getAllUsersController)
+userRouter.delete("/", deleteUserController)
 
 export default userRouter
