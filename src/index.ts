@@ -5,6 +5,8 @@ import { env } from "./config/env";
 import pollRouter from "./routes/poll";
 import userRouter from "./routes/user";
 import { verifyToken } from "./middlewares";
+import cors from "cors";
+import { corsOptions } from "./integrations/cors";
 
 const {
   PORT,
@@ -13,6 +15,7 @@ const {
 
 const app = express();
 
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get("/", (req, res) => {
