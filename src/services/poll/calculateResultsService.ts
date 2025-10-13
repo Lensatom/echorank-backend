@@ -28,7 +28,7 @@ interface ProcessedVote {
   weight: number;
 }
 
-export const calculateResultsService = (votes: Vote[]): Map<string, SectionResult> => {
+export const calculateResultsService = (votes: any) => {
   const sectionResults = new Map<string, SectionResult>();
   const votesBySection = groupVotesBySection(votes);
   
