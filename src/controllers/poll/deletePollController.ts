@@ -9,7 +9,7 @@ export const deletePollController = async (req:Request, res:Response) => {
     if (!poll) {
       return res.status(404).json({ message: "Poll not found" })
     }
-    if (poll.user._id.toString() !== userId) {
+    if (poll.user_id.toString() !== userId) {
       return res.status(403).json({ message: "You are not authorized to delete this poll" })
     }
     await Poll.findByIdAndDelete(pollId)

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { paginationHelper } from "../../helpers";
 import Poll from "../../models/poll";
+import Vote from "../../models/vote";
 
 export const getUserPollsController = async (req: Request, res: Response) => {
   try {
@@ -58,5 +59,22 @@ export const getAllPollsController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({ message: "Error fetching polls" });
+  }
+}
+
+
+
+export const getPollVotesController = async (req: Request, res: Response) => {
+  try {
+    const { pollId } = req.params;
+    const poll = await Poll.findById(pollId);
+    if (!poll) {
+      return res.status(404).json({ message: "Poll not found" });
+    }
+
+    const votes = await Vote.find({ pollId: poll._id }).populate("user", "_id first_name last_name email");
+    return res.status(200).json({ votes });
+  } catch (error) {
+    return res.status(500).json({ message: "Error fetching poll votes" });
   }
 }
