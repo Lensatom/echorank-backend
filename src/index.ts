@@ -6,7 +6,7 @@ import pollRouter from "./routes/poll";
 import userRouter from "./routes/user";
 import { verifyToken } from "./middlewares";
 import cors from "cors";
-import { corsOptions } from "./integrations/cors";
+import { corsOptions } from "./config/cors";
 
 const {
   PORT,

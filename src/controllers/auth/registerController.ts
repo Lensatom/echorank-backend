@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
+import { sendVerificationEmail } from "../../config/nodemailer";
 import User from "../../models/user";
 import { generateToken, hashSecret } from "./helpers";
-import { send } from "process";
-import { sendVerificationEmail } from "../../integrations/nodemailer";
 
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();

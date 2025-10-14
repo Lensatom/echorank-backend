@@ -12,8 +12,7 @@ export const getPollResultsController = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Poll not found" });
     }
 
-    const resultId = poll.result_id;
-    const result = await Result.findById(resultId);
+    const result = await Result.findOne({ pollId: poll._id });
     if (!result) {
       return res.status(404).json({ message: "Poll results not found" });
     }

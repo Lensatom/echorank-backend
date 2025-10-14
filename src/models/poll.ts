@@ -20,7 +20,6 @@ const pollSchema = new Schema({
   sections: { type: [sectionSchema], required: true },
   voteCount: { type: Number, required: true, default: 0 },
   user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  result_id: { type: Schema.Types.ObjectId, ref: 'Result', required: true },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
 })
