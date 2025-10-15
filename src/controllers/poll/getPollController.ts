@@ -12,7 +12,7 @@ export const getUserPollsController = async (req: Request, res: Response) => {
       Model: Poll,
       page,
       limit,
-      query: { user: { _id: id } }
+      query: { user_id: id }
     })
 
     return res.status(200).json({
