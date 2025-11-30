@@ -17,23 +17,23 @@ export const addPollVoteController = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Ranking is required" });
     }
 
-    for (const optionId of ranking) {
-      const optionExists = poll.sections.some(section =>
-        section.options.some(option => option._id.toString() === optionId)
-      );
-      if (!optionExists && optionId !== "others") {
-        return res.status(400).json({ message: `Invalid option ID in ranking: ${optionId}` });
-      }
-    }
+    // for (const optionId of ranking) {
+    //   const optionExists = poll.sections.some(section =>
+    //     section.options.some(option => option._id.toString() === optionId)
+    //   );
+    //   if (!optionExists && optionId !== "others") {
+    //     return res.status(400).json({ message: `Invalid option ID in ranking: ${optionId}` });
+    //   }
+    // }
 
     if (ranking.length < poll.sections.length && !ranking.includes("others")) {
       return res.status(400).json({ message: "Ranking must include all options" });
     }
     
     await Vote.create({
-      pollId: poll._id,
-      ranking,
-      user: { _id: userId }
+      poll_id: poll._id,
+      user_id: userId,
+      sections: ranking,
     });
     
     poll.voteCount += 1;

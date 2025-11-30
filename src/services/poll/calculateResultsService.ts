@@ -18,7 +18,7 @@ interface SectionResult {
 
 interface Round {
   roundNumber: number;
-  counts: Map<string, number>;
+  counts: Record<string, number>; // changed: use a serializable object for counts
   eliminated: string[];
   quota: number;
 }
@@ -29,14 +29,13 @@ interface ProcessedVote {
 }
 
 export const calculateResultsService = (votes: any) => {
-  const sectionResults = new Map<string, SectionResult>();
+  // changed: return a plain object
+  const sectionResults: Record<string, SectionResult> = {};
   const votesBySection = groupVotesBySection(votes);
-  
   for (const [sectionId, sectionVotes] of votesBySection) {
     const result = calculateSectionResult(sectionId, sectionVotes);
-    sectionResults.set(sectionId, result);
+    sectionResults[sectionId] = result;
   }
-  
   return sectionResults;
 };
 
@@ -167,13 +166,13 @@ function getAllOptions(votes: VoteSection[]): Set<string> {
   return options;
 }
 
-function countFirstPreferences(votes: ProcessedVote[], eliminated: Set<string>): Map<string, number> {
-  const counts = new Map<string, number>();
+function countFirstPreferences(votes: ProcessedVote[], eliminated: Set<string>): Record<string, number> {
+  const counts: Record<string, number> = {};
   
   for (const vote of votes) {
     for (const option of vote.ranking) {
       if (!eliminated.has(option)) {
-        counts.set(option, (counts.get(option) || 0) + vote.weight);
+        counts[option] = (counts[option] || 0) + vote.weight;
         break;
       }
     }
@@ -182,8 +181,8 @@ function countFirstPreferences(votes: ProcessedVote[], eliminated: Set<string>):
   return counts;
 }
 
-function findMajorityWinner(counts: Map<string, number>, quota: number): string | null {
-  for (const [option, count] of counts) {
+function findMajorityWinner(counts: Record<string, number>, quota: number): string | null {
+  for (const [option, count] of Object.entries(counts)) {
     if (count >= quota) {
       return option;
     }
@@ -191,11 +190,11 @@ function findMajorityWinner(counts: Map<string, number>, quota: number): string 
   return null;
 }
 
-function findPluralityWinner(counts: Map<string, number>): string | null {
+function findPluralityWinner(counts: Record<string, number>): string | null {
   let maxCount = 0;
   let winner: string | null = null;
   
-  for (const [option, count] of counts) {
+  for (const [option, count] of Object.entries(counts)) {
     if (count > maxCount) {
       maxCount = count;
       winner = option;
@@ -206,38 +205,33 @@ function findPluralityWinner(counts: Map<string, number>): string | null {
 }
 
 function findOptionsToEliminate(
-  counts: Map<string, number>, 
-  eliminated: Set<string>, 
+  counts: Record<string, number>,
+  eliminated: Set<string>,
   allOptions: Set<string>
 ): string[] {
-  const activeCounts = new Map<string, number>();
+  const activeCounts: Record<string, number> = {};
   
-  for (const [option, count] of counts) {
+  for (const [option, count] of Object.entries(counts)) {
     if (!eliminated.has(option)) {
-      activeCounts.set(option, count);
+      activeCounts[option] = count;
     }
   }
   
   for (const option of allOptions) {
-    if (!eliminated.has(option) && !activeCounts.has(option)) {
-      activeCounts.set(option, 0);
+    if (!eliminated.has(option) && activeCounts[option] === undefined) {
+      activeCounts[option] = 0;
     }
   }
   
-  if (activeCounts.size <= 1) {
+  const activeOptions = Object.keys(activeCounts);
+  if (activeOptions.length <= 1) {
     return [];
   }
   
-  const minCount = Math.min(...activeCounts.values());
-  const toEliminate: string[] = [];
+  const minCount = Math.min(...Object.values(activeCounts));
+  const toEliminate = activeOptions.filter((opt) => activeCounts[opt] === minCount);
   
-  for (const [option, count] of activeCounts) {
-    if (count === minCount) {
-      toEliminate.push(option);
-    }
-  }
-  
-  if (toEliminate.length >= activeCounts.size) {
+  if (toEliminate.length >= activeOptions.length) {
     return [toEliminate[0]];
   }
   

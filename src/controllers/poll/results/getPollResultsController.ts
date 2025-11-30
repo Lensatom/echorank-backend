@@ -25,7 +25,7 @@ export const getPollResultsController = async (req: Request, res: Response) => {
       return res.status(200).json({ message: "Result as at last vote", results: result });
     }
 
-    const votes = await Vote.find({ pollId: poll._id });
+    const votes = await Vote.find({ poll_id: poll._id });
     if (votes.length === 0) {
       return res.status(200).json({ message: "No votes found for this poll." });
     }
@@ -38,6 +38,8 @@ export const getPollResultsController = async (req: Request, res: Response) => {
         groups: section.groups || {}
       }))
     }));
+
+    console.log(formattedVotes)
 
     const calculatedResults = calculateResultsService(formattedVotes);
     console.log("Calculated Results:", calculatedResults);

@@ -4,6 +4,7 @@ import {
   createPollController,
   deletePollController,
   getPollByIdController,
+  getPollResultsController,
   getUserPollsController
 } from "../controllers/poll";
 
@@ -14,5 +15,6 @@ pollRouter.get("/", getUserPollsController);
 pollRouter.get("/:pollId", getPollByIdController);
 pollRouter.delete("/:pollId", deletePollController);
 pollRouter.post("/:pollId/vote", addPollVoteController);
+pollRouter.get("/:pollId/results", getPollResultsController);
 
 export default pollRouter;
