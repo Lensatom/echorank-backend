@@ -1,12 +1,12 @@
 import express  from "express"
 import { connectDB } from "./config/db";
-import authRouter from "./routes/auth";
 import { env } from "./config/env";
 import pollRouter from "./routes/poll";
 import userRouter from "./routes/user";
 import { verifyToken } from "./middlewares";
 import cors from "cors";
 import { corsOptions } from "./config/cors";
+import authRouter from "./modules/auth/routes";
 
 const {
   PORT,

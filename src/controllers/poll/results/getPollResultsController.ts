@@ -21,14 +21,16 @@ export const getPollResultsController = async (req: Request, res: Response) => {
     const resultVoteCount = result.voteCountCalculated || 0;
     const isResultStale = voteCount !== resultVoteCount;
 
-    if (!isResultStale) {
-      return res.status(200).json({ message: "Result as at last vote", results: result });
-    }
+    // if (!isResultStale) {
+    //   return res.status(200).json({ message: "Result as at last vote", results: votes });
+    // }
 
     const votes = await Vote.find({ poll_id: poll._id });
     if (votes.length === 0) {
-      return res.status(200).json({ message: "No votes found for this poll." });
+      return res.status(200).json({ message: "No votes found for this poll.", results: votes });
     }
+
+    console.log("Fetched Votes:", votes);
 
     const formattedVotes = votes.map(vote => ({
       _id: vote._id.toString(),
@@ -44,7 +46,7 @@ export const getPollResultsController = async (req: Request, res: Response) => {
     const calculatedResults = calculateResultsService(formattedVotes);
     console.log("Calculated Results:", calculatedResults);
 
-    return res.status(200).json({ results: calculatedResults });
+    return res.status(200).json({ results: votes });
   } catch (error) {
     return res.status(500).json({ message: "Error fetching poll results" });
   }
