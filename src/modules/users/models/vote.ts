@@ -18,6 +18,4 @@ const voteSchema = new Schema({
   updated_at: { type: Date, default: Date.now }
 })
 
-const Vote = model('Vote', voteSchema);
-
-export default Vote;  
+export const Vote = model('Vote', voteSchema);

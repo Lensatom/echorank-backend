@@ -1,20 +1,39 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
+import { formatResponse } from "../../../helpers";
 import User from "../../../models/user";
-import { tokenGeneratorService } from "../services/token.service";
+import { comparePassword } from "../services/passwordService";
+import { generateTokens } from "../services/tokenService";
 
 export const loginController = async (req:Request, res:Response) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Email and password are required" });
+    if (!email || !password) return (
+      formatResponse({
+        res,
+        type: "clientError",
+        message: "Email and password are required"
+      })
+    );
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: "Invalid email or password" });
+    if (!user) return (
+      formatResponse({
+        res,
+        type: "unauthorized",
+        message: "Invalid email or password"
+      })
+    );
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(401).json({ message: "Invalid email or password" });
+    const isPasswordValid = await comparePassword(password, user.password);
+    if (!isPasswordValid) return (
+      formatResponse({
+        res,
+        type: "unauthorized",
+        message: "Invalid email or password"
+      })
+    );
 
-    const token = tokenGeneratorService(user._id.toString());
+    const token = generateTokens(user._id.toString());
     
     const userDataForResponse = {
       _id: user._id,
@@ -25,8 +44,19 @@ export const loginController = async (req:Request, res:Response) => {
       updated_at: user.updated_at
     }
 
-    res.status(200).json({ message: "Login successful", token, user: userDataForResponse });
+    return (
+      formatResponse({
+        res,
+        type: "success",
+        message: "Login successful",
+        data: { token, user: userDataForResponse },
+      })
+    );
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    formatResponse({
+      res,
+      type: "serverError",
+      message: "Internal server error"
+    });
   }
 }

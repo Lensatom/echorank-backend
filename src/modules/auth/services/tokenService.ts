@@ -6,7 +6,7 @@ const {
   JWT_EXPIRES_IN
 } = env
 
-export const tokenGeneratorService = (id:string) => {
+export const generateTokens = (id:string) => {
   const payload = { id }
   const options: SignOptions = { expiresIn: JWT_EXPIRES_IN };
   const token = jwt.sign(payload, JWT_SECRET!, options);

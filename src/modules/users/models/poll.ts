@@ -24,6 +24,4 @@ const pollSchema = new Schema({
   updated_at: { type: Date, default: Date.now }
 })
 
-const Poll = model('Poll', pollSchema);
-
-export default Poll;
+export const Poll = model('Poll', pollSchema);

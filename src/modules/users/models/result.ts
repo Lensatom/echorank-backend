@@ -9,6 +9,4 @@ const resultSchema = new Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-const Result = model('Result', resultSchema);
-
-export default Result;
+export const Result = model('Result', resultSchema);
