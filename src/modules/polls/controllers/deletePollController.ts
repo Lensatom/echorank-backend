@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import Poll from "../../models/poll"
+import { Poll } from "../models"
 
 export const deletePollController = async (req:Request, res:Response) => {
   try {

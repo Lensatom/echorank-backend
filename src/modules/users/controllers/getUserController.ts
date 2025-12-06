@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { paginationHelper } from "../../helpers";
-import User from "../../models/user";
+import { User } from "../models";
+import { paginationHelper } from "../../../helpers";
 
 export const retrieveUserController = async (req:Request, res:Response) => {
   const { id } = req.user ?? {}

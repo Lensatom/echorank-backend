@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { paginationHelper } from "../../helpers";
-import Poll from "../../models/poll";
-import Vote from "../../models/vote";
+import { paginationHelper } from "../../../helpers";
+import { Poll, Vote } from "../models";
 
 export const getUserPollsController = async (req: Request, res: Response) => {
   try {

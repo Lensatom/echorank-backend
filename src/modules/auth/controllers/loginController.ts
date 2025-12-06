@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { formatResponse } from "../../../helpers";
-import User from "../../../models/user";
 import { comparePassword } from "../services/passwordService";
 import { generateTokens } from "../services/tokenService";
+import { User } from "../../users/models";
 
 export const loginController = async (req:Request, res:Response) => {
   try {

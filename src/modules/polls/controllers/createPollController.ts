@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-import Poll from "../../models/poll";
-import User from "../../models/user";
-import Vote from "../../models/vote";
-import Result from "../../models/result";
+import { User } from "../../users/models";
+import { Poll, Result } from "../models";
 
 export const createPollController = async (req:Request, res:Response) => {
   try {
