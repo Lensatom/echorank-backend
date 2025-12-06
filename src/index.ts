@@ -1,12 +1,12 @@
-import express  from "express"
-import { connectDB } from "./config/db";
-import authRouter from "./routes/auth";
-import { env } from "./config/env";
-import pollRouter from "./routes/poll";
-import userRouter from "./routes/user";
-import { verifyToken } from "./middlewares";
 import cors from "cors";
+import express from "express";
 import { corsOptions } from "./config/cors";
+import { connectDB } from "./config/db";
+import { env } from "./config/env";
+import { verifyToken } from "./middlewares";
+import authRouter from "./modules/auth/routes";
+import pollsRouter from "./modules/polls/routes";
+import userRouter from "./modules/users/routes";
 
 const {
   PORT,
@@ -25,14 +25,10 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter)
 
 app.use(verifyToken)
-app.use("/user", userRouter)
-app.use("/poll", pollRouter)
+app.use("/users", userRouter)
+app.use("/polls", pollsRouter)
 
 connectDB(MONGODB_URI)
-
-const crypto = require('crypto');
-const secret = crypto.randomBytes(64).toString('hex');
-console.log(secret);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
