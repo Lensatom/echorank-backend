@@ -30,10 +30,6 @@ app.use("/polls", pollsRouter)
 
 connectDB(MONGODB_URI)
 
-const crypto = require('crypto');
-const secret = crypto.randomBytes(64).toString('hex');
-console.log(secret);
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

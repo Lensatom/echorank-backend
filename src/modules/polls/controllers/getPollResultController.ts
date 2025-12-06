@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { calculateResultsService } from "../../../services/poll/calculateResultsService";
 import { Poll, Result, Vote } from "../models";
+import { calculateResultsService } from "../services/calculateResultService";
 
 export const getPollResultsController = async (req: Request, res: Response) => {
   try {
