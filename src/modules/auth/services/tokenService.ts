@@ -7,8 +7,13 @@ const {
 } = env
 
 export const generateTokens = (id:string) => {
-  const payload = { id }
+  const data = { id }
   const options: SignOptions = { expiresIn: JWT_EXPIRES_IN };
-  const token = jwt.sign(payload, JWT_SECRET!, options);
+  const token = jwt.sign(data, JWT_SECRET!, options);
   return token;
+}
+
+export const verifyAuthToken = (token:string) => {
+  const decoded = jwt.verify(token, JWT_SECRET!) as { id: string };
+  return decoded;
 }

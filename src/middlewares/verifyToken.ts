@@ -1,26 +1,15 @@
 import { NextFunction, Request, Response } from "express"
-import jwt from "jsonwebtoken"
-import { env } from "../config/env"
+import { formatResponse } from "../helpers"
+import { verifyAuthToken } from "../modules/auth/services/tokenService"
 import { UserPayload } from "../types/express"
-
-const {
-  JWT_SECRET
-} = env
 
 export const verifyToken = (req:Request, res:Response, next:NextFunction) => {
   const token = req.headers.authorization?.split(" ")[1]
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" })
-  }
+  if (!token) return formatResponse({ res, type: "unauthorized" })
 
-  const decoded = jwt.verify(token, JWT_SECRET) as UserPayload
-  if (!decoded) {
-    return res.status(401).json({ message: "Unauthorized" })
-  }
-
-  if (!decoded.id) {
-    return res.status(401).json({ message: "Unauthorized" })
-  }
+  const decoded = verifyAuthToken(token) as UserPayload
+  if (!decoded) return formatResponse({ res, type: "unauthorized" })
+  if (!decoded.id) return formatResponse({ res, type: "unauthorized" })
 
   req.user = decoded
   next()

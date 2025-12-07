@@ -1,58 +1,74 @@
 import { Request, Response } from "express";
+import { formatResponse } from "../../../helpers";
 import { User } from "../../users/models";
 import { Poll, Result } from "../models";
 
 export const createPollController = async (req:Request, res:Response) => {
   try {
+    const { id } = req.user!;
     const {
       title,
-      sub_title,
+      description,
       sections
-    } = req.body;
+    } = req.body;    
 
-    const { id } = req.user ?? {}
-    const user = await User.findById(id).select('_id first_name last_name email')
+    const missingPollField = ['title', 'sections', 'description'].find((f) => !req.body[f]);
+    if (missingPollField) {
+      return formatResponse({ res, type: "clientError", message: `${missingPollField} is required` });
+    }
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" })
+    if (!Array.isArray(sections) || sections.length === 0) {
+      return formatResponse({ res, type: "clientError", message: "sections must be a non-empty array" });
     }
-    
-    const options = [];
-    if (!title) {
-      return res.status(400).json({ message: "Title is required" });
-    }
-    if (!sections || !Array.isArray(sections) || sections.length === 0) {
-      return res.status(400).json({ message: "At least one section is required" });
-    }
+
     for (const section of sections) {
-      if (!section.title) {
-        return res.status(400).json({ message: "Each section must have a title" });
+      const missingSectionField = ['name', 'options'].find((f) => !section[f]);
+      if (missingSectionField) {
+        return formatResponse({ res, type: "clientError", message: `${missingSectionField} is required in each section` });
       }
-      if (!section.options || !Array.isArray(section.options) || section.options.length < 1) {
-        return res.status(400).json({ message: "Each section must have at least one option" });
+
+      if (!Array.isArray(section.options) || section.options.length === 0) {
+        return formatResponse({ res, type: "clientError", message: "options must be a non-empty array in each section" });
       }
-      options.push(...section.options);
+
+      for (const option of section.options) {
+        const missingOptionField = ['name'].find((f) => !option[f]);
+        if (missingOptionField) {
+          return formatResponse({ res, type: "clientError", message: `${missingOptionField} is required in each option` });
+        }
+      }
     }
-    for (const option of options) {
-      if (!option.title) {
-        return res.status(400).json({ message: "Each option must have a title" });
-      }
+
+    const user = await User.findById(id).select('_id')
+    if (!user) {
+      return formatResponse({ res, type: "clientError", message: "User does not exist" })
     }
 
     const poll = await Poll.create({
       title,
-      sub_title,
+      description,
       sections,
-      user_id: user._id
+      user_id: user._id,
+      voteCount: 0
     });
 
     await Result.create({
       pollId: poll._id,
+      voteCountCalculated: 0,
     });
 
-    return res.status(201).json({ message: "Poll created successfully", poll });
+    return formatResponse({
+      res, type: "created",
+      message: "Poll created successfully",
+      data: { poll }
+    });
   } catch (error) {
     console.error("Error creating poll:", error);
-    return res.status(500).json({ message: "Internal server error", error });
+    return formatResponse({
+      res,
+      type: "serverError",
+      message: "Internal server error",
+      error
+    });
   }
 }

@@ -12,8 +12,9 @@ interface FormatResponseParams {
   res: any;
   statusCode?: number;
   type: keyof typeof statusCodes;
-  message: string;
+  message?: string;
   data?: any;
+  error?: any;
 }
 
 export const formatResponse = ({
@@ -22,6 +23,7 @@ export const formatResponse = ({
   type,
   message,
   data,
+  error
 }: FormatResponseParams) => {
   const hasStatusCode = typeof statusCode === "number";
   const hasType = typeof type === "string";
@@ -30,7 +32,7 @@ export const formatResponse = ({
     throw new Error("formatResponse: Provide either 'statusCode' or 'type', not both and not neither.");
   }
 
-  const finalStatusCode = hasStatusCode
+  const finalStatusCode: any = hasStatusCode
     ? statusCode!
     : statusCodes[type as keyof typeof statusCodes];
 
@@ -38,9 +40,14 @@ export const formatResponse = ({
     throw new Error(`Invalid 'type' provided. Valid types are: ${Object.keys(statusCodes).join(", ")}`);
   }
 
-  const responsePayload: any = { message };
+  const responsePayload: any = { message: message || type || "" };
+
   if (data) {
     responsePayload["data"] = data;
+  }
+
+  if (error) {
+    responsePayload["error"] = error;
   }
 
   return res.status(finalStatusCode).json(responsePayload);

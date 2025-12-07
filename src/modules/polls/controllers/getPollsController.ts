@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { paginationHelper } from "../../../helpers";
+import { formatResponse, paginationHelper } from "../../../helpers";
 import { Poll, Vote } from "../models";
 
 export const getUserPollsController = async (req: Request, res: Response) => {
@@ -14,12 +14,9 @@ export const getUserPollsController = async (req: Request, res: Response) => {
       query: { user_id: id }
     })
 
-    return res.status(200).json({
-      polls,
-      pagination
-    });
+    return formatResponse({ res, type: "success", data: { polls, pagination } });
   } catch (error) {
-    return res.status(500).json({ message: "Error fetching polls" });
+    return formatResponse({ res, type: "serverError", message: "Error fetching polls", error });
   }
 }
 
