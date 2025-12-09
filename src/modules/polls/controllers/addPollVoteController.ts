@@ -35,7 +35,6 @@ export const addPollVoteController = async (req: Request, res: Response) => {
       sections: ranking,
     });
     
-    poll.voteCount += 1;
     await poll.save();
     return res.status(200).json({ message: "Vote added successfully" });
   } catch (error) {

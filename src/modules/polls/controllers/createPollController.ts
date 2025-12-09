@@ -49,7 +49,6 @@ export const createPollController = async (req:Request, res:Response) => {
       description,
       sections,
       user_id: user._id,
-      voteCount: 0
     });
 
     await Result.create({
