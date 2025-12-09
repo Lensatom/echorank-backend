@@ -4,7 +4,7 @@ const resultSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, required: true, auto: true },
   pollId: { type: Schema.Types.ObjectId, ref: 'Poll', required: true },
   voteCountCalculated: { type: Number, default: 0 },
-  sections: { type: Array },
+  sections: { type: Array, default: [] },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
 });

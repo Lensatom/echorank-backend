@@ -56,32 +56,45 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
     }
     
     const votes = await Vote.find({ poll_id: poll._id });
+    const sectionIdArr = poll.sections.map(section => section.sectionId.toString());
 
-    const formattedVotes = votes.map(vote => ({
-      _id: vote._id.toString(),
-      sections: vote.sections.map(section => ({
-        sectionId: section.sectionId,
-        ranking: section.ranking,
-        groups: section.groups || {}
-      }))
-    }));
-    const calculatedResults = calculateResultsService(formattedVotes);
+    const resultsCalculated: Record<string, any>[] = [];
+    for (let index = 0; index < sectionIdArr.length; index++) {
+      const totalOptionCounts = poll.sections[index].options.length;
+      const calculatedResults = calculateResultsService({
+        votes,
+        sectionId: sectionIdArr[index],
+        totalOptionCounts
+      });
+      resultsCalculated.push({ [sectionIdArr[index]]: calculatedResults });
+    }
 
-    Result.findByIdAndUpdate(result._id, {
-      $set: {
-        voteCountCalculated: voteCount,
-        sections: calculatedResults.sections
-      }
-    }, { new: true }).exec();
+    console.log("Calculated Results:", resultsCalculated);
 
-    const resultUpdated = await Result.findById(result._id);
+    const updated = await Result.findByIdAndUpdate(
+      result._id,
+      {
+        $set: {
+          voteCountCalculated: voteCount,
+          sections: resultsCalculated
+        }
+      },
+      { new: true }
+    ).exec();
+
     return formatResponse({
       res,
       type: "success",
       message: "Poll results updated successfully",
-      data: { results: resultUpdated }
+      data: { results: updated }
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error fetching poll results" });
+    console.log("Error fetching most updated poll results:", error);
+    return formatResponse({
+      res,
+      type: "serverError",
+      message: "Error fetching most updated poll results",
+      error
+    });
   }
 }
