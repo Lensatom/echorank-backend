@@ -37,8 +37,7 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
       return res.status(404).json({ message: "Poll results not found" });
     }
 
-    const votes = await Vote.find({ poll_id: poll._id });
-    const voteCount = votes.length;
+    const voteCount = await Vote.countDocuments({ poll_id: poll._id });
     if (voteCount === result.voteCountCalculated) {
       return formatResponse({
         res,
@@ -47,7 +46,7 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
         data: { results: result }
       })
     }
-    if (votes.length === 0) {
+    if (voteCount === 0) {
       return formatResponse({
         res,
         type: "success",
@@ -55,6 +54,8 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
         data: { results: result }
       })
     }
+    
+    const votes = await Vote.find({ poll_id: poll._id });
 
     const formattedVotes = votes.map(vote => ({
       _id: vote._id.toString(),
