@@ -7,6 +7,7 @@ import { verifyToken } from "./middlewares";
 import authRouter from "./modules/auth/routes";
 import pollsRouter from "./modules/polls/routes";
 import userRouter from "./modules/users/routes";
+import votesRouter from "./modules/votes/routes";
 
 const {
   PORT,
@@ -27,6 +28,7 @@ app.use("/auth", authRouter)
 app.use(verifyToken)
 app.use("/users", userRouter)
 app.use("/polls", pollsRouter)
+app.use("/votes", votesRouter)
 
 connectDB(MONGODB_URI)
 
