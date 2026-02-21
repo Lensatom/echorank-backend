@@ -69,8 +69,6 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
       resultsCalculated.push({ [sectionIdArr[index]]: calculatedResults });
     }
 
-    console.log("Calculated Results:", resultsCalculated);
-
     const updated = await Result.findByIdAndUpdate(
       result._id,
       {
