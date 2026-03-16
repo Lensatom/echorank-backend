@@ -16,7 +16,7 @@ export const getCalculatedPollResultsController = async (req: Request, res: Resp
       return res.status(404).json({ message: "Poll results not found" });
     }
 
-    return res.status(200).json({ results });
+    return res.status(200).json({ results: results.toObject() });
   } catch (error) {
     return res.status(500).json({ message: "Error fetching poll results" });
   }
@@ -37,13 +37,19 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
       return res.status(404).json({ message: "Poll results not found" });
     }
 
+    const pollObject = poll.toObject();
+    const resultObject = result.toObject();
+
     const voteCount = await Vote.countDocuments({ poll_id: poll._id });
     if (voteCount === result.voteCountCalculated) {
       return formatResponse({
         res,
         type: "success",
         message: "Poll results are up to date",
-        data: { results: result }
+        data: { results: {
+          ...resultObject,
+          poll: pollObject
+        }}
       })
     }
     if (voteCount === 0) {
@@ -80,11 +86,26 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
       { new: true }
     ).exec();
 
+    const updatedObject = updated?.toObject();
+
+    if (!updatedObject) {
+      return formatResponse({
+        res,
+        type: "serverError",
+        message: "Poll results update failed"
+      });
+    }
+
     return formatResponse({
       res,
       type: "success",
       message: "Poll results updated successfully",
-      data: { results: updated }
+      data: {
+        results: {
+          poll: pollObject,
+          ...updatedObject
+        }
+      }
     });
   } catch (error) {
     console.log("Error fetching most updated poll results:", error);
