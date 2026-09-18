@@ -67,11 +67,11 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
 
     const resultsCalculated: Record<string, any>[] = [];
     for (let index = 0; index < sectionIdArr.length; index++) {
-      const totalOptionCounts = poll.sections[index].options.length;
+      const candidates = poll.sections[index].options.map(option => option.name);
       const calculatedResults = calculateResultsService({
         votes,
         sectionId: sectionIdArr[index],
-        totalOptionCounts
+        candidates
       });
       resultsCalculated.push({ [sectionIdArr[index]]: calculatedResults });
     }

@@ -1,41 +1,40 @@
 export function calculateResultsService({
   votes,
   sectionId,
-  round = 1,
-  prevOptionCounts = {},
-  totalOptionCounts
+  candidates,
+  eliminatedCandidates = []
 }: {
-  votes:any,
-  sectionId: string,
-  round?: number,
-  prevOptionCounts?: Record<string, number>,
-  totalOptionCounts: number
+  votes: any;
+  sectionId: string;
+  candidates: string[];
+  eliminatedCandidates?: string[];
 }) {
+  const candidateSet = new Set(candidates);
   const optionCounts = optionVoteCounts({
     votes,
-    sectionId: sectionId,
-    round,
-    prevOptionCounts
-  });
-  const lowestOptions = getLowestCountOption(optionCounts);
-  const redistributedOptionCounts = redistributeVotes({
-    votes,
-    sectionId: sectionId,
-    eliminated: lowestOptions,
-    round,
-    prevOptionCounts: optionCounts
+    sectionId,
+    candidates,
+    candidateSet,
+    eliminatedCandidates
   });
 
-  if (round === totalOptionCounts) {
-    return redistributedOptionCounts;
+  const activeCandidates = candidates.filter(candidate => !eliminatedCandidates.includes(candidate));
+  if (activeCandidates.length <= 1) {
+    return optionCounts;
   }
+
+  const lowestOptions = getLowestCountOption(optionCounts, activeCandidates);
+  if (lowestOptions.length === activeCandidates.length) {
+    return optionCounts;
+  }
+
+  const eliminatedOption = lowestOptions[0];
 
   return calculateResultsService({
     votes,
     sectionId,
-    round: round + 1,
-    prevOptionCounts: redistributedOptionCounts,
-    totalOptionCounts
+    candidates,
+    eliminatedCandidates: [...eliminatedCandidates, eliminatedOption]
   });
 }
 
@@ -43,29 +42,45 @@ export function calculateResultsService({
 function optionVoteCounts({
   votes,
   sectionId,
-  round,
-  prevOptionCounts
+  candidates,
+  candidateSet,
+  eliminatedCandidates
 }: {
   votes: any;
   sectionId: string;
-  round: number;
-  prevOptionCounts?: Record<string, number>;
+  candidates: string[];
+  candidateSet: Set<string>;
+  eliminatedCandidates: string[];
 }) {
-  const optionCounts: Record<string, number> = prevOptionCounts || {};
+  const optionCounts: Record<string, number> = Object.fromEntries(
+    candidates.map(candidate => [candidate, 0])
+  );
+
   for (let i = 0; i < votes.length; i++) {
     const indexOfSection = votes[i].sections.findIndex((sec: any) => sec.sectionId.toString() === sectionId);
-    if (indexOfSection === -1) continue;
-    const option = votes[i].sections[indexOfSection].ranking[round - 1];
-    optionCounts[option] = (optionCounts[option] || 0) + 1;
+    if (indexOfSection === -1) {
+      continue;
+    }
+
+    const ranking: string[] = votes[i].sections[indexOfSection].ranking;
+    const option = ranking.find((candidate: string) => candidateSet.has(candidate) && !eliminatedCandidates.includes(candidate));
+    if (!option) {
+      continue;
+    }
+
+    optionCounts[option] += 1;
   }
+
   return optionCounts;
 }
 
 
-function getLowestCountOption(optionCounts: Record<string, number>): string[] {
+function getLowestCountOption(optionCounts: Record<string, number>, activeCandidates: string[]): string[] {
   let lowestCount = Infinity;
   const lowestOptions: string[] = [];
-  for (const [option, count] of Object.entries(optionCounts)) {
+
+  for (const option of activeCandidates) {
+    const count = optionCounts[option] ?? 0;
     if (count < lowestCount) {
       lowestCount = count;
       lowestOptions.length = 0;
@@ -74,31 +89,6 @@ function getLowestCountOption(optionCounts: Record<string, number>): string[] {
       lowestOptions.push(option);
     }
   }
+
   return lowestOptions;
-}
-
-
-function redistributeVotes({
-  votes,
-  sectionId,
-  eliminated,
-  round,
-  prevOptionCounts
-}: {
-  votes: any;
-  sectionId: string;
-  eliminated: string[];
-  round: number;
-  prevOptionCounts: Record<string, number>;
-}) {
-  const optionCounts: Record<string, number> = prevOptionCounts;
-  for (let i = 0; i < votes.length; i++) {
-    const indexOfSection = votes[i].sections.findIndex((sec: any) => sec.sectionId.toString() === sectionId);
-    if (eliminated.includes(votes[i].sections[indexOfSection].ranking[round - 1])) {
-      if (indexOfSection === -1) continue;
-      const option = votes[i].sections[indexOfSection].ranking[round];
-      optionCounts[option] = (optionCounts[option] || 0) + 1;
-    }
-  }
-  return optionCounts;
 }

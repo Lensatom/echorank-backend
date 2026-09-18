@@ -1,7 +1,7 @@
-import dotenv from "dotenv"
-import path from "path"
+import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config({ path: path.resolve(__dirname, "../../.env") })
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const required = ["MONGODB_URI", "JWT_SECRET"];
 for (const key of required) {
@@ -20,5 +20,5 @@ export const env = {
   JWT_SECRET: process.env.JWT_SECRET!,
   JWT_EXPIRES_IN: JWT_EXPIRES_IN || "7d",
   EMAIL_SERVICE_USER: process.env.EMAIL_SERVICE_USER || "",
-  EMAIL_SERVICE_PASSWORD: process.env.EMAIL_SERVICE_PASSWORD || ""
+  EMAIL_SERVICE_PASSWORD: process.env.EMAIL_SERVICE_PASSWORD || "",
 };
