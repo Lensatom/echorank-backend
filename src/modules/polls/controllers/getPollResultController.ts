@@ -48,7 +48,8 @@ export const getMostUpdatedPollResultsController = async (req: Request, res: Res
         message: "Poll results are up to date",
         data: { results: {
           ...resultObject,
-          poll: pollObject
+          poll: pollObject,
+          voteCount: voteCount
         }}
       })
     }
